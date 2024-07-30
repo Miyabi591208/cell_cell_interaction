@@ -2,7 +2,7 @@
 
 ### CrossTalkeR install
 
-まずはCellPhoneDBのinstall
+まずはCellPhoneDBのinstall(リポジトリ内に最新版v5.00あり)
 
 ```bash
 conda create -n cpdb python=3.8
