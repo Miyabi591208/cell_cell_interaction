@@ -12,15 +12,15 @@ pip install cellphonedb
 cellphondbは手動でダウンロード
 ```
 
-<使用手順>
-１：mail.shの以下を実行する環境に合わせて修正すること
-  cellphonedb_proc.R, shaping_hcount_meta.py, cellphonedb_res_shaping.py. 
-  のそれぞれのファイルディレクトリの指定部分. 
+<使用手順>  
+１：mail.shの以下を実行する環境に合わせて修正すること  
+  cellphonedb_proc.R, shaping_hcount_meta.py, cellphonedb_res_shaping.py.   
+  のそれぞれのファイルディレクトリの指定部分.   
 
-2 ：shaping_hcount_meta.pyの以下を実行する環境に合わせて修正すること. 
-   cellphonedb.zipのディレクトリの指定
+2 ：shaping_hcount_meta.pyの以下を実行する環境に合わせて修正すること.   
+   cellphonedb.zipのディレクトリの指定  
    
-3 ：main.shを用いたコマンドを実行
+3 ：main.shを用いたコマンドを実行  
 <例>
 bash main.sh \
 -f file_path \ ファイルパスの指定
