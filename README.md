@@ -21,10 +21,10 @@ cellphondbは手動でダウンロード
    cellphonedb.zipのディレクトリの指定  
    
 3 ：main.shを用いたコマンドを実行  
-<例>
-bash main.sh \
--f file_path \ ファイルパスの指定
--p project_name \　プロジェクト名等を指定
--o output_dir \ 結果の出力先(パス)を指定
--t statistical_analysis_significant_means_Text_file_name \ statistical_analysis_significant_means_Textの名前を指定した名前にリネーム
--a mail_address 実行が完了したことを知らせるメールアドレス先
+<例>  
+bash main.sh \  
+-f file_path \ ファイルパスの指定  
+-p project_name \　プロジェクト名等を指定  
+-o output_dir \ 結果の出力先(パス)を指定  
+-t statistical_analysis_significant_means_Text_file_name \ statistical_analysis_significant_means_Textの名前を指定した名前にリネーム  
+-a mail_address 実行が完了したことを知らせるメールアドレス先  
