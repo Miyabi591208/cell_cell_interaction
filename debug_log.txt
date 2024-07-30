@@ -1,0 +1,24 @@
+Processing comparison:  POST
+Columns after merge for POST_x_PRE : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for POST_x_PRE : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  CNVLow
+Columns after merge for CNVLow_x_CNVHigh : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for CNVLow_x_CNVHigh : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  CNVLow
+Columns after merge for CNVLow_x_CNVHigh : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for CNVLow_x_CNVHigh : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  CNVLow
+Columns after merge for CNVLow_x_CNVHigh : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for CNVLow_x_CNVHigh : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  CNVLow
+Columns after merge for CNVLow_x_CNVHigh : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for CNVLow_x_CNVHigh : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  POST
+Columns after merge for POST_x_PRE : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for POST_x_PRE : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  CNVLow
+Columns after merge for CNVLow_x_CNVHigh : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for CNVLow_x_CNVHigh : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair
+Processing comparison:  POST
+Columns after merge for POST_x_PRE : allpair, cellpair.x, source.x, target.x, gene_A.x, gene_B.x, type_gene_A.x, type_gene_B.x, MeanLR.x, ligpair.x, recpair.x, LRScore.x, cellpair.y, source.y, target.y, gene_A.y, gene_B.y, type_gene_A.y, type_gene_B.y, MeanLR.y, ligpair.y, recpair.y, LRScore.y
+Columns in final_data for POST_x_PRE : LRScore, ligpair, recpair, allpair, type_gene_A, type_gene_B, gene_A, gene_B, source, target, cellpair

@@ -1,0 +1,424 @@
+---
+title: "Single_Cell_crosstalker"
+output: 
+  html_document:
+    out.height: 10
+    out.width: 20
+    fig_width: 20
+    fig_height: 10
+    toc: true
+    toc_float: true
+    theme: cerulean
+    highlight: kate
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE)
+# Set Environment
+# Sys.setenv("https_proxy"="http://gw.east.ncc.go.jp:8080")
+# Sys.setenv("http_proxy"="http://gw.east.ncc.go.jp:8080")
+```
+
+```{r cars, echo=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+library(BiocManager)
+# install.packages('/Users/saito_h/Desktop/GlobalOptions_0.1.2.tgz',repos = NULL)
+# install.packages('/Users/saito_h/Desktop/colorspace_2.1-0.tgz',repos = NULL)
+# install.packages("/Users/saito_h/Desktop/Biobase_2.46.0.tgz",repos = NULL)
+```
+
+```{r cars2, echo=FALSE}
+# install.packages("knitr")
+# install.packages("devtools")
+# install.packages("pbkrtest")
+# install.packages("car")
+# install.packages("ggpubr")
+# devtools::install_github("jokergoo/circlize")
+# BiocManager::install("Biobase")
+# BiocManager::install("BiocNeighbors")
+# install.packages("NMF")
+# devtools::install_github("jokergoo/ComplexHeatmap")
+# devtools::install_github("sqjin/CellChat")
+# library(devtools)
+# install.packages("devtools")
+# devtools::install_github("CostaLab/CrossTalkeR", build_vignettes = TRUE)
+# devtools::install_github("rnabioco/crosstalker")
+# Crosstalkerパッケージのロード
+# library(crosstalker)
+```
+
+
+
+```{r library, echo=FALSE}
+library(Seurat)
+library(ggplot2)
+library(BiocManager)
+library(ComplexHeatmap)
+# library(CellChat)
+# library(CrossTalkeR)
+library(dplyr)
+library(ggforce)
+library(viridis)
+library(data.table)
+library(ggrepel)
+library(patchwork)
+library(tidyverse)
+library(magrittr)
+library(liana)
+library(tidyr)
+library(igraph)
+set.seed(777)
+# remotes::install_github("rlesur/klippy")
+# BiocManager::install("ComplexHeatmap")
+```
+
+
+```{r klippy, echo=FALSE, include=TRUE}
+# remotes::install_github("rlesur/klippy")
+klippy::klippy()
+```
+
+```{r}
+base_path <- "/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Code/CrossTalkeR/R/"
+source(paste0(base_path, "single_condition.R"))
+source(paste0(base_path, "comparative_condition.R"))
+source(paste0(base_path, "lrobject.R"))
+source(paste0(base_path, "plot.R"))
+source(paste0(base_path, "generate_report.R"))
+source(paste0(base_path, "utils.R"))
+```
+
+```{r}
+kegg_annotation <- function(data, slot, out_path, database = org.Hs.eg.db::org.Hs.eg.db, org = 'hsa', n = 100) {
+  rkg <- slot(data, slot)
+  for (x in names(rkg)) {
+    all = list()
+    for (i in names(rkg[[x]])) {
+      if (i != 'nodes' & grepl('ggi', x) & !grepl('_x_', x)) {
+        sel <- rkg[[x]][!grepl("tf-", rkg[[x]]$nodes),]
+        top <- sel %>%
+          dplyr::top_n(n, wt = sel[[i]])
+        topenrich <- enrich(top$nodes, name = i, db = database, org = org)
+        all[[i]] <- topenrich
+      } else if (i != 'nodes' & grepl('ggi', x) & grepl('_x_', x)) {
+        sel <- rkg[[x]][!grepl("tf-", rkg[[x]]$nodes),]
+        top <- sel %>%
+          dplyr::top_n(n, wt = sel[[i]])
+        topn <- sel %>%
+          dplyr::top_n(-n, wt = sel[[i]])
+        topenrich <- enrich(top$nodes, name = paste0(i, ' up'), db = database, org = org)
+        topnenrich <- enrich(topn$nodes, name = paste0(i, ' down'), db = database, org = org)
+        all[[i]] <- dplyr::bind_rows(topenrich, topnenrich)
+      }
+    }
+    data@annot[[x]] <- dplyr::bind_rows(all)
+  }
+  saveRDS(data, file.path(out_path, "LR_data_final.Rds"))
+  return(data)
+}
+
+```
+
+```{r}
+output_dir = "/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk"
+```
+
+```{r}
+# the method always consider the first path as control: the multiple control case will be handle soon
+paths <- c(
+  'CNVHigh' = '/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/cnv_high/filtered_corrected.csv',
+  'CNVLow' = '/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/cnv_low/filtered_corrected.csv'
+)
+
+
+# Generating the report and the object
+data <- generate_report(
+  lrpaths=paths,
+  threshold=0,
+  out_path='/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/', 
+  out_file='CNVHigh_vs_CNVLow.html', 
+  output_fmt = "html_document", 
+  # report = FALSE
+)
+
+png(paste(output_dir,"CNV_High.Low.network.png",sep = "/"), width = 3800, height =3800, res = 500)　
+plot_cci(
+  graph = data@graphs$CNVLow_x_CNVHigh, 
+  coords = data@coords, 
+  colors = data@colors, 
+  plt_name = "", 
+  pg = data@rankings$CNVLow_x_CNVHigh$Pagerank,  
+  vnames = FALSE, 
+  leg = TRUE
+)
+dev.off()
+```
+
+
+```{r}
+
+# the method always consider the first path as control: the multiple control case will be handle soon
+paths <- c('PRE' = '/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/Pre/filtered_corrected.csv','POST' = '/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/Post/filtered_corrected.csv'
+)
+
+
+# Generating the report and the object
+# data <- CrossTalkeR::generate_report(
+#   lrpaths=paths,
+#   threshold=0,
+#   out_path='/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/', 
+#   out_file='PRE_vs_POST.html', 
+#   output_fmt = "html_document", 
+#   # report = FALSE
+# )
+
+# Generating the report and the object
+data <- generate_report(
+  lrpaths=paths,
+  threshold=0,
+  out_path='/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/', 
+  out_file='PRE_vs_POST.html', 
+  output_fmt = "html_document"
+  # report = FALSE
+)
+
+
+png(paste(output_dir,"Post.Pre.network.png",sep = "/"), width = 3800, height =3800, res = 500)　
+plot_cci(
+  graph = data@graphs$POST_x_PRE, 
+  coords = data@coords, 
+  colors = data@colors, 
+  plt_name = "", 
+  pg = data@rankings$POST_x_PRE$Pagerank,  
+  vnames = FALSE, 
+  leg = TRUE
+)
+dev.off()
+```
+
+```{r}
+# Read CSV file and print the first few rows to check the content
+data <- read.csv('/Users/hitoshisaito/Bioinfo_Project/scRNAseq_GAPFREE2/Output/crosstalk/Post/filtered_corrected.csv', header=TRUE, sep=",")
+
+# Print the first few rows of the data to check the column names
+print(head(data))
+
+# Check if the necessary columns are present
+required_columns <- c('source','target','gene_A','gene_B','type_gene_A','type_gene_B','MeanLR')
+missing_columns <- setdiff(required_columns, colnames(data))
+
+if (length(missing_columns) > 0) {
+  stop(paste("The following columns are missing in the DataFrame:", paste(missing_columns, collapse=", ")))
+}
+
+print("All required columns are present.")
+```
+
+```{r}
+# install.packages("ggplot2")
+# install.packages("dplyr")
+# install.packages("cowplot")
+# install.packages("geom_textpath")
+
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+library(geomtextpath)
+```
+
+```{r}
+# サンプルデータ
+expression_data <- data.frame(
+  gene = c("STK11", "B2M", "SMARCA4", "NF1/2", "APC", "CDKN2A/B", 
+           "PIK3CA", "MAP3K1", "MAP2K4", "KEAP1", "SOS1", "PDGFRA", 
+           "ERBB2", "MTOR", "JAK1", "JAK2", "BRAF"),
+  expression = c(89, 63, 63, 51, 38, 38, 38, 25, 25, 25, 
+                 13, 13, 13, 13, 13, 13, 10)
+)
+
+# 全体の発現量の合計を計算
+total_expression <- sum(expression_data$expression)
+
+# 非特定の割合を72.2%に設定し、残りの発現量を調整
+none_identified_percentage <- 72.2
+identified_percentage <- 100 - none_identified_percentage
+
+# 各遺伝子の発現割合を計算し、全体の割合に合わせてスケーリング
+expression_data <- expression_data %>%
+  mutate(percentage = expression / total_expression * identified_percentage)
+
+# 内側のリング用データ
+inner_ring_data <- data.frame(
+  category = c("Identified", "None identified"),
+  percentage = c(identified_percentage, none_identified_percentage)
+)
+
+# 内側のリング
+inner_ring <- ggplot(inner_ring_data, aes(x = 1, y = percentage, fill = category)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(0, 2)
+
+# 外側のリング
+outer_ring <- ggplot(expression_data, aes(x = 2, y = percentage, fill = gene)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(1.5, 2.5)
+
+# 外側のリングにラベルを追加
+outer_ring_labels <- outer_ring + 
+  geom_text(aes(label = sprintf("%s\n(%.1f%%)", gene, percentage)),
+            position = position_stack(vjust = 0.5), size = 3, color = "black") +
+  theme(legend.position = "none")
+
+# グラフを結合
+combined_plot <- ggdraw() +
+  draw_plot(inner_ring, 0, 0, 1, 1) +
+  draw_plot(outer_ring_labels, 0, 0, 1, 1) +
+  theme(legend.position = "bottom") +
+  annotate("text", x = 0.5, y = 0.85, label = sprintf("Identified (%.1f%%)", identified_percentage), size = 6, hjust = 0.5, vjust = 0) +
+  annotate("text", x = 0.5, y = 0.15, label = sprintf("None identified (%.1f%%)", none_identified_percentage), size = 6, hjust = 0.5, vjust = 0)
+
+print(combined_plot)
+```
+
+```{r}
+# サンプルデータ
+expression_data <- data.frame(
+  gene = c("STK11", "B2M", "SMARCA4", "NF1/2", "APC", "CDKN2A/B", 
+           "PIK3CA", "MAP3K1", "MAP2K4", "KEAP1", "SOS1", "PDGFRA", 
+           "ERBB2", "MTOR", "JAK1", "JAK2", "BRAF"),
+  expression = c(89, 63, 63, 51, 38, 38, 38, 25, 25, 25, 
+                 13, 13, 13, 13, 13, 13, 10)
+)
+
+# 全体の発現量の合計を計算
+total_expression <- sum(expression_data$expression)
+
+# 非特定の割合を72.2%に設定し、残りの発現量を調整
+none_identified_percentage <- 72.2
+identified_percentage <- 100 - none_identified_percentage
+
+# 各遺伝子の発現割合を計算し、全体の割合に合わせてスケーリング
+expression_data <- expression_data %>%
+  mutate(percentage = expression / total_expression * identified_percentage)
+
+# 内側のリング用データ
+inner_ring_data <- data.frame(
+  category = c("Identified", "None identified"),
+  percentage = c(identified_percentage, none_identified_percentage)
+)
+
+# 外側のリング
+outer_ring <- ggplot(expression_data, aes(x = 2, y = percentage, fill = gene)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(0.5, 2.5)
+
+# 内側のリング
+inner_ring <- ggplot(inner_ring_data, aes(x = 1, y = percentage, fill = category)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(0, 2)
+
+# 外側のリングにラベルを追加
+outer_ring_labels <- outer_ring + 
+  geom_textpath(aes(label = sprintf("%s\n(%.1f%%)", gene, percentage)),
+                hjust = 0.5, vjust = 0.5, size = 3, color = "black",
+                position = position_stack(vjust = 0.5)) +
+  theme(legend.position = "none")
+
+# グラフを結合
+combined_plot <- ggdraw() +
+  draw_plot(inner_ring, 0, 0, 1, 1) +
+  draw_plot(outer_ring_labels, 0, 0, 1, 1) +
+  theme(legend.position = "bottom") +
+  annotate("text", x = 0.5, y = 0.8, label = sprintf("Identified (%.1f%%)", identified_percentage), size = 6, hjust = 0.5, vjust = 0) +
+  annotate("text", x = 0.5, y = 0.2, label = sprintf("None identified (%.1f%%)", none_identified_percentage), size = 6, hjust = 0.5, vjust = 0)
+
+print(combined_plot)
+
+
+```
+
+```{r}
+# サンプルデータ
+expression_data <- data.frame(
+  gene = c("STK11", "B2M", "SMARCA4", "NF1/2", "APC", "CDKN2A/B", 
+           "PIK3CA", "MAP3K1", "MAP2K4", "KEAP1", "SOS1", "PDGFRA", 
+           "ERBB2", "MTOR", "JAK1", "JAK2", "BRAF"),
+  expression = c(89, 63, 63, 51, 38, 38, 38, 25, 25, 25, 
+                 13, 13, 13, 13, 13, 13, 10)
+)
+
+# 全体の発現量の合計を計算
+total_expression <- sum(expression_data$expression)
+
+# 非特定の割合を72.2%に設定し、残りの発現量を調整
+none_identified_percentage <- 72.2
+identified_percentage <- 100 - none_identified_percentage
+
+# 各遺伝子の発現割合を計算し、全体の割合に合わせてスケーリング
+expression_data <- expression_data %>%
+  mutate(percentage = expression / total_expression * identified_percentage)
+
+# 内側のリング用データ
+inner_ring_data <- data.frame(
+  category = c("Identified", "None identified"),
+  percentage = c(identified_percentage, none_identified_percentage)
+)
+
+# 遺伝子ごとの色設定
+gene_colors <- c(
+  "STK11" = "#E41A1C", "B2M" = "#377EB8", "SMARCA4" = "#4DAF4A", "NF1/2" = "#984EA3", 
+  "APC" = "#FF7F00", "CDKN2A/B" = "#FFFF33", "PIK3CA" = "#A65628", "MAP3K1" = "#F781BF", 
+  "MAP2K4" = "#999999", "KEAP1" = "#66C2A5", "SOS1" = "#FC8D62", "PDGFRA" = "#8DA0CB", 
+  "ERBB2" = "#E78AC3", "MTOR" = "#A6D854", "JAK1" = "#FFD92F", "JAK2" = "#E5C494", 
+  "BRAF" = "#B3B3B3"
+)
+
+# 外側のリング
+outer_ring <- ggplot(expression_data, aes(x = 2, y = percentage, fill = gene)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  scale_fill_manual(values = gene_colors) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(0.5, 2.5)
+
+# 内側のリング
+inner_ring <- ggplot(inner_ring_data, aes(x = 1, y = percentage, fill = category)) +
+  geom_bar(stat = "identity", color = "white", size = 0.5) +
+  scale_fill_manual(values = c("Identified" = "#377EB8", "None identified" = "#E41A1C")) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "none") +
+  xlim(0, 2)
+
+# 外側のリングにラベルを追加
+outer_ring_labels <- outer_ring + 
+  geom_text(aes(y = cumsum(percentage) - percentage / 2, label = sprintf("%s\n(%.1f%%)", gene, percentage)), 
+            size = 3, color = "black") +
+  theme(legend.position = "none")
+
+# グラフを結合
+combined_plot <- ggdraw() +
+  draw_plot(inner_ring, 0, 0, 1, 1) +
+  draw_plot(outer_ring_labels, 0, 0, 1, 1) +
+  theme(legend.position = "bottom") +
+  annotate("text", x = 0.5, y = 0.8, label = sprintf("Identified (%.1f%%)", identified_percentage), size = 6, hjust = 0.5, vjust = 0) +
+  annotate("text", x = 0.5, y = 0.2, label = sprintf("None identified (%.1f%%)", none_identified_percentage), size = 6, hjust = 0.5, vjust = 0)
+
+print(combined_plot)
+
+
+```
