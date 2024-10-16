@@ -1,15 +1,20 @@
-## Update 20240731
+## Update 20241016
 
 ### CrossTalkeR install
 
 まずはCellPhoneDBのinstall(リポジトリ内に最新版v5.00あり)
 
 ```bash
+minicondaをインストールした後condaによる仮想環境の構築
+以下のリンクより対応するOSのminicondaをインストール
+https://docs.anaconda.com/miniconda/
+minicondaによる仮想環境の設定
 conda create -n cpdb python=3.8
 conda activate cpdb
 
 pip install cellphonedb
-cellphondbは手動でダウンロード
+cellphondbのデータベースは以下リンクより手動でダウンロード
+https://www.cellphonedb.org/
 ```
 
 <使用手順>  
